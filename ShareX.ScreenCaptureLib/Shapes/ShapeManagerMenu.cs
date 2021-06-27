@@ -508,8 +508,7 @@ namespace ShareX.ScreenCaptureLib
             };
             cms.Items.Add(tslnudCornerRadius);
 
-            // TODO: Translate
-            tscbBorderStyle = new ToolStripLabeledComboBox("Border style:");
+            tscbBorderStyle = new ToolStripLabeledComboBox(Resources.ShapeManager_BorderStyle);
             tscbBorderStyle.Content.AddRange(Helpers.GetLocalizedEnumDescriptions<BorderStyle>());
             tscbBorderStyle.Content.SelectedIndexChanged += (sender, e) =>
             {
