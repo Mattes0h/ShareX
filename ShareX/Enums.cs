@@ -220,6 +220,8 @@ namespace ShareX
         ImageThumbnailer,
         VideoConverter,
         VideoThumbnailer,
+        InspectWindow,
+        ClipboardViewer,
         TweetMessage,
         MonitorTest,
         // Other
@@ -239,7 +241,7 @@ namespace ShareX
         ToastNotification
     }
 
-    public enum ToastClickAction
+    public enum ToastClickAction  // Localized
     {
         [Description("Close notification")]
         CloseNotification,
@@ -284,11 +286,6 @@ namespace ShareX
     public enum ThumbnailTitleLocation
     {
         Top, Bottom
-    }
-
-    public enum ScreenRecordState
-    {
-        Waiting, BeforeStart, AfterStart, AfterRecordingStart, Encoding
     }
 
     public enum RegionCaptureType

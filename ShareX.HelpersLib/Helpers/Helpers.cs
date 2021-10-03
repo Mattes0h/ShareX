@@ -1351,13 +1351,19 @@ namespace ShareX.HelpersLib
             }
         }
 
-        public static T[] GetInstances<T>() where T : class
+        public static IEnumerable<T> GetInstances<T>() where T : class
         {
-            IEnumerable<T> instances = from t in Assembly.GetCallingAssembly().GetTypes()
-                                       where t.IsClass && t.IsSubclassOf(typeof(T)) && t.GetConstructor(Type.EmptyTypes) != null
-                                       select Activator.CreateInstance(t) as T;
+            Type baseType = typeof(T);
+            Assembly assembly = baseType.Assembly;
+            return assembly.GetTypes().Where(t => t.IsClass && t.IsSubclassOf(baseType) && t.GetConstructor(Type.EmptyTypes) != null).
+                Select(t => Activator.CreateInstance(t) as T);
+        }
 
-            return instances.ToArray();
+        public static IEnumerable<Type> FindSubclassesOf<T>()
+        {
+            Type baseType = typeof(T);
+            Assembly assembly = baseType.Assembly;
+            return assembly.GetTypes().Where(t => t.IsSubclassOf(baseType));
         }
 
         public static string GetOperatingSystemProductName(bool includeBit = false)
@@ -1611,6 +1617,40 @@ namespace ShareX.HelpersLib
         {
             HashSet<string> allowedExtensions = new HashSet<string>(extensions, StringComparer.OrdinalIgnoreCase);
             return directoryInfo.EnumerateFiles().Where(f => allowedExtensions.Contains(f.Extension)).Select(x => x.FullName);
+        }
+
+        public static Icon GetProgressIcon(int percentage)
+        {
+            return GetProgressIcon(percentage, Color.FromArgb(16, 116, 193));
+        }
+
+        public static Icon GetProgressIcon(int percentage, Color color)
+        {
+            percentage = percentage.Clamp(0, 99);
+
+            Size size = SystemInformation.SmallIconSize;
+            using (Bitmap bmp = new Bitmap(size.Width, size.Height))
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                int y = (int)(size.Height * (percentage / 100f));
+
+                if (y > 0)
+                {
+                    using (Brush brush = new SolidBrush(color))
+                    {
+                        g.FillRectangle(brush, 0, size.Height - 1 - y, size.Width, y);
+                    }
+                }
+
+                using (Font font = new Font("Arial", 10))
+                using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+                {
+                    g.DrawString(percentage.ToString(), font, Brushes.Black, size.Width / 2f, size.Height / 2f, sf);
+                    g.DrawString(percentage.ToString(), font, Brushes.White, size.Width / 2f, (size.Height / 2f) - 1, sf);
+                }
+
+                return Icon.FromHandle(bmp.GetHicon());
+            }
         }
     }
 }
